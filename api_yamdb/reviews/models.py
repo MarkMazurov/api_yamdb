@@ -37,6 +37,7 @@ class Review(models.Model):
     # author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     item_rating = models.IntegerField(
+        default=1,
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
     pub_date = models.DateTimeField(
