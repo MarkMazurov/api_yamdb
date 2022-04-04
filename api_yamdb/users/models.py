@@ -47,5 +47,8 @@ class CustomUser(AbstractUser):
     def set_confirmation_code(self, confirmation_code):
         self.confirmation_code = make_password(confirmation_code)
 
+    def set_password(self, password):
+        self.password = password
+
     def __str__(self):
         return f'{self.username}, {self.email}'
