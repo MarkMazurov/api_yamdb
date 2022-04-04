@@ -1,10 +1,7 @@
-from django.contrib.auth.hashers import make_password
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils import timezone
-import jwt
-from users.validators import validate_birth_year
 
 CHOICES = (
     ('user', 'Пользователь'),
@@ -21,8 +18,7 @@ class CustomUser(AbstractUser):
     first_name = models.CharField('Имя', max_length=30, blank=True)
     last_name = models.CharField('Фамилия', max_length=150, blank=True)
     date_joined = models.DateTimeField('Дата создания', default=timezone.now)
-    birth_year = models.IntegerField(blank=True, null=True,
-                                     validators=[validate_birth_year])
+    bio = models.CharField('Биография', max_length=200, blank=True)
     role = models.CharField(
         'Роль',
         choices=CHOICES,
@@ -45,9 +41,10 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def set_confirmation_code(self, confirmation_code):
-        self.confirmation_code = make_password(confirmation_code)
+        self.confirmation_code = confirmation_code
 
-    def set_password(self, password):
+    # Автоматическое присваивание пароля, (set_password - не работает админка).
+    def set_password_code(self, password):
         self.password = password
 
     def __str__(self):
