@@ -17,12 +17,16 @@ class Title(models.Model):
     description = models.TextField()
     genre = models.ForeignKey(
         Genre,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         related_name='titles',
         null=True
     )
     category = models.ForeignKey(
         Category,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL,
         related_name='titles',
         null=True
