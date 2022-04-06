@@ -47,5 +47,17 @@ class CustomUser(AbstractUser):
     def set_password_code(self, password):
         self.password = password
 
+    @property
+    def is_user(self):
+        return self.role == 'user'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+
     def __str__(self):
         return f'{self.username}, {self.email}'
