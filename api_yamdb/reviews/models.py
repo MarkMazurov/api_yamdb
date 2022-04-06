@@ -1,6 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from users.models import CustomUser
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
@@ -29,7 +31,7 @@ class Title(models.Model):
         related_name='titles',
         null=True
     )
-    
+
     def __str__(self):
         return self.name
 
@@ -39,7 +41,7 @@ class Review(models.Model):
         Title,
         on_delete=models.CASCADE,
         related_name='reviews')
-    # author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     text = models.TextField()
     item_rating = models.IntegerField(
         default=1,
@@ -55,7 +57,7 @@ class Review(models.Model):
             models.UniqueConstraint(fields=[
                 'reviewed_item',
                 'item_rating',
-                # 'author'
+                'author'
             ], name='unique_rating')
         ]
 
@@ -67,7 +69,7 @@ class Comment(models.Model):
         related_name='comments'
     )
     text = models.TextField()
-    # author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         'Дата публикации комментария',
         auto_now_add=True,

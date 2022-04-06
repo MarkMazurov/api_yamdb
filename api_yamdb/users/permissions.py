@@ -21,6 +21,16 @@ class AdminOnly(BasePermission):
         return check_role(request, 'admin')
 
 
+class UserOnly(BasePermission):
+    def has_permission(self, request, view):
+        return check_role(request, 'user')
+
+
+class ModeratorOnly(BasePermission):
+    def has_permission(self, request, view):
+        return check_role(request, 'moderator')
+
+
 class AuthorOrAdminOrModeratorOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:
