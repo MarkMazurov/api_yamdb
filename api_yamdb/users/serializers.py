@@ -8,6 +8,7 @@ from users.models import CustomUser
 
 
 class UserRegistationSerializer(serializers.ModelSerializer):
+    """Сериализатор модели CustomUserModels для регистрации пользователей."""
     class Meta:
         model = CustomUser
         fields = ('username', 'email')
@@ -20,6 +21,7 @@ class UserRegistationSerializer(serializers.ModelSerializer):
         ]
 
     def validate_username(self, value):
+        """Проверка имени пользователя."""
         if value.lower() == ('me' * (len(value) // 2)):
             raise serializers.ValidationError(
                 f'Имя {value} не может быть использованно')
@@ -27,6 +29,7 @@ class UserRegistationSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор модели CustomUserModels."""
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'first_name',
@@ -40,6 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     def validate_username(self, value):
+        """Проверка имени пользователя."""
         if value.lower() == ('me' * (len(value) // 2)):
             raise serializers.ValidationError(
                 f'Имя {value} не может быть использованно')
@@ -47,16 +51,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenSerializer(serializers.Serializer):
-    """Получение токена"""
+    """Получение токена."""
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
 
     @classmethod
     def get_tokens_for_user(cls, user):
+        """Обновление токена."""
         return RefreshToken.for_user(user)
 
     @staticmethod
     def validate_username(value):
+        """Поиск указанных данных."""
         try:
             if CustomUser.objects.get(username=value):
                 return value
@@ -66,6 +72,7 @@ class CustomTokenSerializer(serializers.Serializer):
             raise NotFound(massage)
 
     def validate(self, attrs):
+        """Проверка username и confirmation_code."""
         user = get_object_or_404(CustomUser, username=attrs['username'])
         if bool(attrs['confirmation_code'] == user.confirmation_code):
             refresh = self.get_tokens_for_user(user)
