@@ -1,6 +1,6 @@
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils import timezone
 
 CHOICES = (
@@ -11,6 +11,7 @@ CHOICES = (
 
 
 class CustomUser(AbstractUser):
+    """Кастомная модель пользователя основанная на AbstractUser."""
     username = models.CharField(
         'Имя пользователя', max_length=150, unique=True,
         validators=[MinLengthValidator(5, message='Минимум 5 символов')])
@@ -41,22 +42,26 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def set_confirmation_code(self, confirmation_code):
+        """Установка confirmation_code"""
         self.confirmation_code = confirmation_code
 
-    # Автоматическое присваивание пароля, (set_password - не работает админка).
     def set_password_code(self, password):
+        """Установка password"""
         self.password = password
 
     @property
     def is_user(self):
+        """Проверить является ли пользователь 'user'."""
         return self.role == 'user'
 
     @property
     def is_moderator(self):
+        """Проверить является ли пользователь 'moderator'."""
         return self.role == 'moderator'
 
     @property
     def is_admin(self):
+        """Проверить является ли пользователь 'admin'."""
         return self.role == 'admin'
 
     def __str__(self):

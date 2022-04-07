@@ -1,28 +1,22 @@
+from rest_framework import status, viewsets
+from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
 from django.conf import settings
 from django.utils.crypto import get_random_string
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status, viewsets, mixins
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
-
 from users.models import CustomUser
 from users.permissions import AdminOnly
-from users.serializers import UserSerializer, CustomTokenSerializer, \
-    UserRegistationSerializer
-
-
-class CreateOnlyModelViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    pass
+from users import serializers
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """CRUD user models"""
+    """CRUD user models."""
     queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
     permission_classes = (AdminOnly,)
     pagination_class = LimitOffsetPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, ]
@@ -34,9 +28,26 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(
+        detail=False,
+        methods=['get', 'put', 'patch'],
+        permission_classes=[IsAuthenticated]
+    )
+    def me(self, request):
+        """API для редактирования текущим пользователем своих данных."""
+        user = request.user
+        if request.method == 'GET':
+            serializer = self.get_serializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        serializer = self.get_serializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(role=user.role, partial=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenSerializer
+    serializer_class = serializers.CustomTokenSerializer
 
 
 @api_view(['POST'])
@@ -46,7 +57,7 @@ def get_confirmation_code(request):
     Получить код подтверждения и пароль на переданный email.
     Поля email и username должны быть уникальными.
     """
-    serializer = UserRegistationSerializer(data=request.data)
+    serializer = serializers.UserRegistationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = CustomUser.objects.create(
         username=serializer.validated_data['username'],
@@ -65,7 +76,7 @@ def get_confirmation_code(request):
     return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
-class Custom_TokenObtainPairView(TokenViewBase):
+class CustomTokenView(TokenViewBase):
     """Получение токена взамен username и confirmation code."""
-    serializer_class = CustomTokenSerializer
+    serializer_class = serializers.CustomTokenSerializer
     permission_classes = (AllowAny,)
