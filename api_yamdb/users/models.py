@@ -1,6 +1,6 @@
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils import timezone
 
 CHOICES = (

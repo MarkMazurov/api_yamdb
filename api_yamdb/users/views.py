@@ -1,14 +1,13 @@
+from rest_framework import status, viewsets
+from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
 from django.conf import settings
 from django.utils.crypto import get_random_string
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status, viewsets
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
-
 from users.models import CustomUser
 from users.permissions import AdminOnly
 from users import serializers
@@ -77,7 +76,7 @@ def get_confirmation_code(request):
     return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
-class Custom_TokenObtainPairView(TokenViewBase):
+class CustomTokenView(TokenViewBase):
     """Получение токена взамен username и confirmation code."""
     serializer_class = serializers.CustomTokenSerializer
     permission_classes = (AllowAny,)
