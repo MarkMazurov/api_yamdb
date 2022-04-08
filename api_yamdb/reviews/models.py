@@ -37,13 +37,13 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    reviewed_item = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name='reviews')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     text = models.TextField()
-    item_rating = models.IntegerField(
+    score = models.IntegerField(
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
@@ -55,8 +55,8 @@ class Review(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=[
-                'reviewed_item',
-                'item_rating',
+                'title',
+                'score',
                 'author'
             ], name='unique_rating')
         ]

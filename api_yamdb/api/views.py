@@ -1,4 +1,4 @@
-from rest_framework import filters, mixins, permissions, viewsets
+from rest_framework import filters, mixins, permissions, serializers, viewsets
 from rest_framework.permissions import AllowAny
 
 from django.contrib.auth import get_user_model
@@ -60,11 +60,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorOrAdminOrModeratorOnly]
     permission_classes_by_action = {'list': [AllowAny],
                                     'create': [
-                                        AdminOnly | ModeratorOnly | UserOnly],
-                                    'retrieve': [AllowAny],
-                                    'partial_update': [
-                                        AuthorOrAdminOrModeratorOnly],
-                                    'destroy': [AuthorOrAdminOrModeratorOnly]}
+                                        AdminOnly | ModeratorOnly | UserOnly]}
 
     def get_queryset(self):
         current_title = get_object_or_404(
@@ -73,10 +69,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return current_title.reviews.all()
 
     def perform_create(self, serializer):
-        reviewed_item = get_object_or_404(
+        current_title = get_object_or_404(
             Title, pk=self.kwargs.get('title_id')
         )
-        serializer.save(author=self.request.user, reviewed_item=reviewed_item)
+        author = self.request.user
+        if Review.objects.filter(author=author, title=current_title).exists():
+            raise serializers.ValidationError(
+                "Вами уже был оставлен отзыв на это произведение")
+        serializer.save(author=author, title=current_title)
 
     def get_permissions(self):
         try:
@@ -91,11 +91,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorOrAdminOrModeratorOnly]
     permission_classes_by_action = {'list': [AllowAny],
                                     'create': [
-                                        AdminOnly | ModeratorOnly | UserOnly],
-                                    'retrieve': [AllowAny],
-                                    'partial_update': [
-                                        AuthorOrAdminOrModeratorOnly],
-                                    'destroy': [AuthorOrAdminOrModeratorOnly]}
+                                        AdminOnly | ModeratorOnly | UserOnly]}
 
     def get_queryset(self):
         current_review = get_object_or_404(
