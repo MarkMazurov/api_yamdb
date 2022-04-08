@@ -1,5 +1,6 @@
 import datetime as dt
 
+from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.serializers import SlugRelatedField
@@ -11,8 +12,6 @@ User = get_user_model()
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    # удаление жанра или категории происходит только через указание
-    # Id объекта, а не через поле slug. Надо решить этот вопрос!
 
     class Meta:
         model = Genre
@@ -29,10 +28,16 @@ class CategorySerializer(serializers.ModelSerializer):
 class TitleListSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
         fields = '__all__'
+
+    def get_rating(self, obj):
+        rating = Review.objects.filter(
+            reviewed_item=obj.id).aggregate(Avg('item_rating'))
+        return rating['item_rating__avg']
 
 
 class TitleSerializer(serializers.ModelSerializer):

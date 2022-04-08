@@ -3,11 +3,11 @@ from rest_framework.permissions import AllowAny
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
 
 from reviews.models import Category, Genre, Review, Title
 from users.permissions import (AdminOnly, ModeratorOnly, UserOnly,
-                               AuthorOrAdminOrModeratorOnly)
+                               AuthorOrAdminOrModeratorOnly, ReadOrAdminOnly)
+from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           TitleSerializer, TitleListSerializer)
@@ -23,22 +23,26 @@ class ListCreateDestViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 class GenreViewSet(ListCreateDestViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = [ReadOrAdminOnly]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class CategoryViewSet(ListCreateDestViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [ReadOrAdminOnly]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category', 'genre', 'name', 'year')
+    permission_classes = [ReadOrAdminOnly]
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.request.method in permissions.SAFE_METHODS:
