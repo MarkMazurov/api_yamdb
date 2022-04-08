@@ -5,8 +5,8 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from reviews.models import Category, Genre, Review, Title
-from users.permissions import (AdminOnly, ModeratorOnly, UserOnly,
-                               AuthorOrAdminOrModeratorOnly, ReadOrAdminOnly)
+from users.permissions import (AdminOnly, AuthorOrAdminOrModeratorOnly,
+                               ModeratorOnly, ReadOrAdminOnly, UserOnly)
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
