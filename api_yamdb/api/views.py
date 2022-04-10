@@ -1,12 +1,10 @@
-from rest_framework import filters, mixins, permissions, serializers, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework import filters, mixins, permissions, viewsets
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from reviews.models import Category, Genre, Review, Title
-from users.permissions import (AdminOnly, ModeratorOnly, UserOnly,
-                               ReadOrAdminOnly, AuthorOrAdminOrModeratorOnly)
+from users.permissions import (ReadOrAdminOnly, AuthorOrAdminOrModeratorOnly)
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
@@ -51,11 +49,12 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """
+    Вьюсет модели Review.
+    Переопределение методов get_queryset и perform_create.
+    """
     serializer_class = ReviewSerializer
     permission_classes = [AuthorOrAdminOrModeratorOnly]
-    permission_classes_by_action = {'list': [AllowAny],
-                                    'create': [
-                                        AdminOnly | ModeratorOnly | UserOnly]}
 
     def get_queryset(self):
         current_title = get_object_or_404(
@@ -67,26 +66,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
         current_title = get_object_or_404(
             Title, pk=self.kwargs.get('title_id')
         )
-        author = self.request.user
-        if Review.objects.filter(author=author, title=current_title).exists():
-            raise serializers.ValidationError(
-                "Вами уже был оставлен отзыв на это произведение")
-        serializer.save(author=author, title=current_title)
-
-    def get_permissions(self):
-        try:
-            return [permission() for permission
-                    in self.permission_classes_by_action[self.action]]
-        except KeyError:
-            return [permission() for permission in self.permission_classes]
+        serializer.save(author=self.request.user, title=current_title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """
+    Вьюсет модели Comment.
+    Переопределение методов get_queryset и perform_create.
+    """
     serializer_class = CommentSerializer
     permission_classes = [AuthorOrAdminOrModeratorOnly]
-    permission_classes_by_action = {'list': [AllowAny],
-                                    'create': [
-                                        AdminOnly | ModeratorOnly | UserOnly]}
 
     def get_queryset(self):
         current_review = get_object_or_404(
@@ -99,10 +88,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, pk=review_id, title__id=title)
         serializer.save(author=self.request.user, review=review)
-
-    def get_permissions(self):
-        try:
-            return [permission() for permission
-                    in self.permission_classes_by_action[self.action]]
-        except KeyError:
-            return [permission() for permission in self.permission_classes]

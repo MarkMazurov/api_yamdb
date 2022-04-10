@@ -40,23 +40,30 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews')
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    text = models.TextField()
-    score = models.IntegerField(
+        related_name='reviews',
+        verbose_name='Произведение')
+    author = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, verbose_name='Автор')
+    text = models.TextField(verbose_name='Текст')
+    score = models.PositiveSmallIntegerField(
         default=1,
-        validators=[MinValueValidator(1), MaxValueValidator(10)]
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        verbose_name='Оценка'
     )
     pub_date = models.DateTimeField(
-        'Дата публикации отзыва',
-        auto_now_add=True,
+        verbose_name='Дата публикации отзыва',
+        auto_now_add=True
     )
 
+    def __str__(self):
+        return self.text[:15]
+
     class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
         constraints = [
             models.UniqueConstraint(fields=[
                 'title',
-                'score',
                 'author'
             ], name='unique_rating')
         ]
@@ -66,11 +73,20 @@ class Comment(models.Model):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
-        related_name='comments'
+        related_name='comments',
+        verbose_name='Отзыв'
     )
-    text = models.TextField()
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    text = models.TextField(verbose_name='Текст')
+    author = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, verbose_name='Автор')
     pub_date = models.DateTimeField(
-        'Дата публикации комментария',
-        auto_now_add=True,
+        verbose_name='Дата публикации комментария',
+        auto_now_add=True
     )
+
+    def __str__(self):
+        return self.text[:15]
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
