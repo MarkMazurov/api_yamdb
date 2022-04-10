@@ -39,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         if request.method == 'GET':
             serializer = self.get_serializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
 
         serializer = self.get_serializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -67,7 +67,6 @@ def get_confirmation_code(request):
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
     confirmation_code = get_random_string(18, chars)
     user.set_confirmation_code(confirmation_code=confirmation_code)
-    user.set_password_code(password=confirmation_code)
     user.save()
     user.email_user(
         subject='Создан confirmation code для получения token',

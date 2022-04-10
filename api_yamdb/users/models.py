@@ -3,10 +3,13 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils import timezone
 
+USER = 'user'
+MODERATOR = 'moderator'
+ADMIN = 'admin'
 CHOICES = (
-    ('user', 'Пользователь'),
-    ('moderator', 'Модератор'),
-    ('admin', 'Администратор'),
+    (USER, 'Пользователь'),
+    (MODERATOR, 'Модератор'),
+    (ADMIN, 'Администратор'),
 )
 
 
@@ -24,7 +27,7 @@ class CustomUser(AbstractUser):
         'Роль',
         choices=CHOICES,
         max_length=10,
-        default='user',
+        default=USER,
         error_messages={'role': 'Выбрана несуществующая роль'}
     )
     confirmation_code = models.CharField(
@@ -45,24 +48,20 @@ class CustomUser(AbstractUser):
         """Установка confirmation_code"""
         self.confirmation_code = confirmation_code
 
-    def set_password_code(self, password):
-        """Установка password"""
-        self.password = password
-
     @property
     def is_user(self):
         """Проверить является ли пользователь 'user'."""
-        return self.role == 'user'
+        return self.role == USER
 
     @property
     def is_moderator(self):
         """Проверить является ли пользователь 'moderator'."""
-        return self.role == 'moderator'
+        return self.role == MODERATOR
 
     @property
     def is_admin(self):
         """Проверить является ли пользователь 'admin'."""
-        return self.role == 'admin'
+        return self.role == ADMIN
 
     def __str__(self):
         return f'{self.username}, {self.email}'

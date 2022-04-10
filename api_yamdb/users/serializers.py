@@ -22,7 +22,7 @@ class UserRegistationSerializer(serializers.ModelSerializer):
 
     def validate_username(self, value):
         """Проверка имени пользователя."""
-        if value.lower() == ('me' * (len(value) // 2)):
+        if value.lower() == 'me':
             raise serializers.ValidationError(
                 f'Имя {value} не может быть использованно')
         return value
@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_username(self, value):
         """Проверка имени пользователя."""
-        if value.lower() == ('me' * (len(value) // 2)):
+        if value.lower() == 'me':
             raise serializers.ValidationError(
                 f'Имя {value} не может быть использованно')
         return value
@@ -64,17 +64,17 @@ class CustomTokenSerializer(serializers.Serializer):
     def validate_username(value):
         """Поиск указанных данных."""
         try:
-            if CustomUser.objects.get(username=value):
+            if CustomUser.objects.filter(username=value).exists():
                 return value
         except CustomUser.DoesNotExist:
-            massage = {'error': 'Не удается пройти аутентификацию с указанными'
+            message = {'error': 'Не удается пройти аутентификацию с указанными'
                                 ' учетными данными'}
-            raise NotFound(massage)
+            raise NotFound(message)
 
     def validate(self, attrs):
         """Проверка username и confirmation_code."""
         user = get_object_or_404(CustomUser, username=attrs['username'])
-        if bool(attrs['confirmation_code'] == user.confirmation_code):
+        if attrs['confirmation_code'] == user.confirmation_code:
             refresh = self.get_tokens_for_user(user)
             return {'token': str(refresh.access_token)}
         raise serializers.ValidationError('Данные не прошли проверку')
