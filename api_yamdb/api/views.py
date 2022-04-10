@@ -6,15 +6,21 @@ from users.permissions import AuthorOrAdminOrModeratorOnly, ReadOrAdminOnly
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleListSerializer, TitleSerializer)
+                          TitleReadSerializer, TitleRecordSerializer)
 
 
 class ListCreateDestViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                             mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    """Кастомный вьюсет для жанров и категорий. Реализуем получение списка,
+    создание и удаление объекта указанных классов.
+    """
+
     pass
 
 
 class GenreViewSet(ListCreateDestViewSet):
+    """Вьюсет для обработки запросов к жанрам."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [ReadOrAdminOnly]
@@ -24,6 +30,8 @@ class GenreViewSet(ListCreateDestViewSet):
 
 
 class CategoryViewSet(ListCreateDestViewSet):
+    """Вьюсет для обработки запросов к категориям."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [ReadOrAdminOnly]
@@ -33,15 +41,17 @@ class CategoryViewSet(ListCreateDestViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для обработки запросов к произведениям."""
+
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+    serializer_class = TitleRecordSerializer
     permission_classes = [ReadOrAdminOnly]
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.request.method in permissions.SAFE_METHODS:
-            return TitleListSerializer
-        return TitleSerializer
+            return TitleReadSerializer
+        return TitleRecordSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

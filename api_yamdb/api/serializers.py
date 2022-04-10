@@ -22,7 +22,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
-class TitleListSerializer(serializers.ModelSerializer):
+class TitleReadSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
     rating = serializers.SerializerMethodField()
@@ -37,7 +37,7 @@ class TitleListSerializer(serializers.ModelSerializer):
         return rating['score__avg']
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class TitleRecordSerializer(serializers.ModelSerializer):
     genre = SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all(),
