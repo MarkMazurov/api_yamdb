@@ -1,16 +1,12 @@
-from rest_framework import filters, mixins, permissions, viewsets
-
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-
+from rest_framework import filters, mixins, permissions, viewsets
 from reviews.models import Category, Genre, Review, Title
-from users.permissions import (ReadOrAdminOnly, AuthorOrAdminOrModeratorOnly)
+from users.permissions import AuthorOrAdminOrModeratorOnly, ReadOrAdminOnly
+
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           TitleListSerializer, TitleSerializer)
-
-User = get_user_model()
 
 
 class ListCreateDestViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,

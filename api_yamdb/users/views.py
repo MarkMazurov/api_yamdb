@@ -8,8 +8,8 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
-from users import serializers
 
+from users import serializers
 from users.models import CustomUser
 from users.permissions import AdminOnly
 
@@ -18,7 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """CRUD user models."""
     queryset = CustomUser.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = (AdminOnly,)
+    permission_classes = [IsAuthenticated, AdminOnly]
     pagination_class = LimitOffsetPagination
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['username']
@@ -78,4 +78,4 @@ def get_confirmation_code(request):
 class CustomTokenView(TokenViewBase):
     """Получение токена взамен username и confirmation code."""
     serializer_class = serializers.CustomTokenSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = [AllowAny]
