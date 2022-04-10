@@ -1,4 +1,4 @@
-# Над проектом [api_yamdb](https://github.com/JabbaS15/api_yamdb) работали:
+# Над проектом [api_yamdb](https://github.com/MarkMazurov/api_yamdb) работали:
 
 [Марк Мазуров](https://github.com/MarkMazurov)
 ##### [Шведков Роман](https://github.com/JabbaS15)

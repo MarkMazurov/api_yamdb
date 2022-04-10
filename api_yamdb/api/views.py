@@ -10,7 +10,7 @@ from users.permissions import (AdminOnly, ModeratorOnly, UserOnly,
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleSerializer, TitleListSerializer)
+                          TitleListSerializer, TitleSerializer)
 
 User = get_user_model()
 
@@ -48,11 +48,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.request.method in permissions.SAFE_METHODS:
             return TitleListSerializer
         return TitleSerializer
-
-    # def get_serializer_class(self):
-    #    if self.action == 'list' or self.action == 'retrieve':
-    #        return TitleListSerializer
-    #    return TitleSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

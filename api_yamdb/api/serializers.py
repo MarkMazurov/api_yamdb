@@ -1,11 +1,12 @@
 import datetime as dt
 
-from django.db.models import Avg
 from django.contrib.auth import get_user_model
+from django.db.models import Avg
 from rest_framework import serializers
-from rest_framework.serializers import SlugRelatedField
+from rest_framework.serializers import (SlugRelatedField, CharField,
+                                        CurrentUserDefault)
 
-from reviews.models import Title, Category, Comment, Genre, Review
+from reviews.models import Category, Comment, Genre, Review, Title
 
 User = get_user_model()
 
@@ -49,7 +50,7 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
-    description = serializers.CharField(required=False)
+    description = CharField(required=False)
 
     class Meta:
         model = Title
@@ -65,9 +66,9 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
+    author = SlugRelatedField(
         read_only=True, slug_field='username',
-        default=serializers.CurrentUserDefault()
+        default=CurrentUserDefault()
     )
 
     class Meta:
@@ -76,9 +77,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
+    author = SlugRelatedField(
         read_only=True, slug_field='username',
-        default=serializers.CurrentUserDefault()
+        default=CurrentUserDefault()
     )
 
     class Meta:
