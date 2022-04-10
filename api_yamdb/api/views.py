@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 
 from reviews.models import Category, Genre, Review, Title
 from users.permissions import (AdminOnly, ModeratorOnly, UserOnly,
-                               ReadOrAdminOnly)
+                               ReadOrAdminOnly, AuthorOrAdminOrModeratorOnly)
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
@@ -52,7 +52,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [ReadOrAdminOnly | ModeratorOnly]
+    permission_classes = [AuthorOrAdminOrModeratorOnly]
     permission_classes_by_action = {'list': [AllowAny],
                                     'create': [
                                         AdminOnly | ModeratorOnly | UserOnly]}
@@ -83,7 +83,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [ReadOrAdminOnly | ModeratorOnly]
+    permission_classes = [AuthorOrAdminOrModeratorOnly]
     permission_classes_by_action = {'list': [AllowAny],
                                     'create': [
                                         AdminOnly | ModeratorOnly | UserOnly]}
