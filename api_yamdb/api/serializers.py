@@ -1,14 +1,11 @@
 import datetime as dt
 
-from django.contrib.auth import get_user_model
 from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.serializers import (SlugRelatedField, CharField,
                                         CurrentUserDefault)
 
 from reviews.models import Category, Comment, Genre, Review, Title
-
-User = get_user_model()
 
 
 class GenreSerializer(serializers.ModelSerializer):
