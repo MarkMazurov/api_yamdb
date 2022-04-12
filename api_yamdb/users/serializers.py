@@ -1,3 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Exists
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import get_object_or_404
@@ -63,13 +65,12 @@ class CustomTokenSerializer(serializers.Serializer):
     @staticmethod
     def validate_username(value):
         """Поиск указанных данных."""
-        try:
-            if CustomUser.objects.get(username=value).exists():
-                return value
-        except CustomUser.DoesNotExist:
-            message = {'error': 'Не удается пройти аутентификацию с указанными'
-                                ' учетными данными'}
-            raise NotFound(message)
+        if not CustomUser.objects.filter(username=value).exists():
+            raise NotFound(
+                {'error': 'Не удается пройти аутентификацию с указанными '
+                          'учетными данными'}
+            )
+        return value
 
     def validate(self, attrs):
         """Проверка username и confirmation_code."""
