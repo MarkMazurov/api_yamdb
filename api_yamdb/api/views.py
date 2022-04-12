@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, permissions, viewsets
 from reviews.models import Category, Genre, Review, Title
-from users.permissions import AuthorOrAdminOrModeratorOnly, ReadOrAdminOnly
+from users.permissions import (AuthorOrReadOnly, IsStaffOnly,
+                               ReadOnly, AdminOnly)
 
 from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -14,7 +15,6 @@ class ListCreateDestViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     """Кастомный вьюсет для жанров и категорий. Реализуем получение списка,
     создание и удаление объекта указанных классов.
     """
-
     pass
 
 
@@ -23,7 +23,7 @@ class GenreViewSet(ListCreateDestViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [ReadOrAdminOnly]
+    permission_classes = [ReadOnly | AdminOnly]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -34,7 +34,7 @@ class CategoryViewSet(ListCreateDestViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [ReadOrAdminOnly]
+    permission_classes = [ReadOnly | AdminOnly]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -45,7 +45,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.all()
     serializer_class = TitleRecordSerializer
-    permission_classes = [ReadOrAdminOnly]
+    permission_classes = [ReadOnly | AdminOnly]
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
@@ -60,7 +60,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     Переопределение методов get_queryset и perform_create.
     """
     serializer_class = ReviewSerializer
-    permission_classes = [AuthorOrAdminOrModeratorOnly]
+    permission_classes = [AuthorOrReadOnly | IsStaffOnly]
 
     def get_queryset(self):
         current_title = get_object_or_404(
@@ -81,7 +81,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     Переопределение методов get_queryset и perform_create.
     """
     serializer_class = CommentSerializer
-    permission_classes = [AuthorOrAdminOrModeratorOnly]
+    permission_classes = [AuthorOrReadOnly | IsStaffOnly]
 
     def get_queryset(self):
         current_review = get_object_or_404(

@@ -1,5 +1,3 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Exists
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import get_object_or_404
@@ -68,7 +66,7 @@ class CustomTokenSerializer(serializers.Serializer):
         if not CustomUser.objects.filter(username=value).exists():
             raise NotFound(
                 {'error': 'Не удается пройти аутентификацию с указанными '
-                          'учетными данными'}
+                          f'учетными данными, проверьте username: {value}'}
             )
         return value
 
