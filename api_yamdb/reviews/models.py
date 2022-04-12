@@ -1,3 +1,5 @@
+import textwrap
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -88,7 +90,7 @@ class Review(models.Model):
     )
 
     def __str__(self):
-        return self.text[:15]
+        return textwrap.shorten(self.text, width=15)
 
     class Meta:
         verbose_name = 'Отзыв'
@@ -124,7 +126,7 @@ class Comment(models.Model):
     )
 
     def __str__(self):
-        return self.text[:15]
+        return textwrap.shorten(self.text, width=15)
 
     class Meta:
         verbose_name = 'Комментарий'
