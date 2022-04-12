@@ -64,7 +64,7 @@ class CustomTokenSerializer(serializers.Serializer):
     def validate_username(value):
         """Поиск указанных данных."""
         try:
-            if CustomUser.objects.filter(username=value).exists():
+            if CustomUser.objects.get(username=value).exists():
                 return value
         except CustomUser.DoesNotExist:
             message = {'error': 'Не удается пройти аутентификацию с указанными'
